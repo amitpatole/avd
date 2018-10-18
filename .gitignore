@@ -53,3 +53,5 @@ Thumbs.db
 *.dmg
 *.ndif
 *.udif
+*.rpm
+*.deb

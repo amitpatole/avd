@@ -8,10 +8,10 @@ sudo dpkg -i vagrant_2.1.5_x86_64.deb
 sudo apt-get update
 sudo apt-get -y install software-properties-common gem python gcc make linux-headers-$(uname -r) dkms
 
-
-vagrant plugin install vagrant-hostmanager
-vagrant plugin install vagrant-hosts
-vagrant plugin install vagrant-persistent-storage
+while read plugin_name
+do
+	vagrant plugin install $plugin_name
+done <plugin_list
 
 
 #install virtualbox
@@ -32,3 +32,6 @@ sudo apt update
 sudo apt-get -y install ansible
 
 #ansible_python_interpreter: python3
+#151.101.64.70 rubygems.org
+#205.251.207.74 gems.hashicorp.com
+
