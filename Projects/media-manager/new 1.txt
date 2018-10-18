@@ -1,0 +1,30 @@
+      echo -e "n\np\n1\n\n\nw" | sudo fdisk /dev/sdb
+      mkfs.xfs -i size=512 /dev/sdb1
+      mkdir -p /var/no-direct-write-here/brick1
+      echo '' >> /etc/fstab >> /etc/fstab
+      echo '# Mount /dev/vdb1 so that it can be used as a glusterfs volume' >> /etc/fstab
+      echo '/dev/vdb1 /var/no-direct-write-here/brick1 xfs defaults 1 2' >> /etc/fstab
+      mount -a && mount
+
+	  
+	  
+	  
+	      docker run -d --name keepalived --restart=always --cap-add=NET_ADMIN --net=host -e KEEPALIVED_UNICAST_PEERS="#PYTHON2BASH:['192.168.4.1', '192.168.4.2','192.168.4.3']" -e KEEPALIVED_VIRTUAL_IPS=192.168.4.4 -e KEEPALIVED_PRIORITY=200 osixia/keepalived:1.3.5
+    args:
+    executable: /bin/bash
+	
+	
+	
+	
+-name: Setup secondary nodes
+ hosts: [ds2,ds3]
+- name: Setup primary node
+  hosts: ds1
+  shell: "{{ lookup ('templates','setup-primary.j2') }}"
+  args:
+          executable: /bin/bash
+- name: Setup secondary nodes
+  hosts: [ds2,ds3]
+  shell: "{{ lookup ('templates','setup-secondary.j2') }}"
+  args:
+         executable: /bin/bash

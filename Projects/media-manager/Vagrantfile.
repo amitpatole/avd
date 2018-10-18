@@ -1,0 +1,62 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+ $script = <<-SCRIPT
+	systemctl disable docker --now
+	systemctl enable docker-latest --now
+	sed -i '/DOCKERBINARY/s/^#//g' /etc/sysconfig/docker
+ SCRIPT
+disk='./data-drive.vdi'
+Vagrant.configure("2") do |config|
+        config.hostmanager.enabled = true
+        config.hostmanager.manage_host = true
+        config.hostmanager.manage_guest = true
+        config.hostmanager.ignore_private_ip = false
+        config.hostmanager.include_offline = true
+        config.vm.define "mm1" do |mm1|
+                mm1.vm.box = "centos/7"
+                mm1.vm.hostname = 'mm1'
+                mm1.vm.network :private_network, ip: '192.168.31.11'
+                mm1.hostmanager.aliases = %w(mm1.localdomain mm1)
+                mm1.vm.provider :virtualbox do |virtualbox|
+                unless File.exist?(disk)
+                        virtualbox.customize ['createhd', '--filename', 'mm1' + disk, '--variant', 'Standard', '--size', 20 * 1024]
+                end
+                virtualbox.memory = 1024
+                virtualbox.cpus = 1
+                virtualbox.customize ['storageattach', :id,  '--storagectl', 'IDE', '--port', 1, '--device', 0, '--type', 'hdd', '--medium','mm1' +  disk]
+        end
+end
+        config.vm.define "mm2" do |mm2|
+                config.vm.box = "centos/7"
+                mm2.vm.hostname = 'mm2'
+                mm2.vm.network :private_network, ip: '192.168.31.12'
+                mm2.hostmanager.aliases = %w(mm2.localdomain mm2)
+                mm2.vm.provider :virtualbox do |virtualbox|
+                unless File.exist?(disk)
+                        virtualbox.customize ['createhd', '--filename', 'mm2' +  disk, '--variant', 'Standard', '--size', 20 * 1024]
+                end
+                virtualbox.memory = 1024
+                virtualbox.cpus = 1
+                virtualbox.customize ['storageattach', :id,  '--storagectl', 'IDE', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', 'mm2' + disk]
+                end
+        end
+        config.vm.define "mm3" do |mm3|
+                config.vm.box = "centos/7"
+                mm2.vm.hostname = 'mm2'
+                mm2.vm.network :private_network, ip: '192.168.31.13'
+                mm2.hostmanager.aliases = %w(mm3.localdomain mm3)
+                mm2.vm.provider :virtualbox do |virtualbox|
+                unless File.exist?(disk)
+                        virtualbox.customize ['createhd', '--filename', 'mm3' +  disk, '--variant', 'Standard', '--size', 20 * 1024]
+                end
+                virtualbox.memory = 1024
+                virtualbox.cpus = 1
+                virtualbox.customize ['storageattach', :id,  '--storagectl', 'IDE', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', 'mm3' + disk]
+                end
+        end
+		config.vm.provision "shell", inline: $script
+		config.vm.provision :ansible do |ansible|
+			ansible.playbook = "playbook.yml"
+		end
+end
+end

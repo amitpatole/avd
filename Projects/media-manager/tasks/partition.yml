@@ -1,0 +1,11 @@
+- name: partition new disk and mount it
+  shell: 
+      echo -e "n\np\n1\n\n\nw" | sudo fdisk /dev/sdb
+      mkfs.xfs -i size=512 /dev/sdb1
+      mkdir -p /var/no-direct-write-here/brick1
+      echo '' >> /etc/fstab >> /etc/fstab
+      echo '# Mount /dev/vdb1 so that it can be used as a glusterfs volume' >> /etc/fstab
+      echo '/dev/vdb1 /var/no-direct-write-here/brick1 xfs defaults 1 2' >> /etc/fstab
+      mount -a && mount
+  args:
+    executable: /bin/bash

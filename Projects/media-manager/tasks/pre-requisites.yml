@@ -1,0 +1,33 @@
+#Install VM Pre requisites
+---
+#- name: install pre-requisites
+  #apt: name=apache2 state=present
+- name: Permit connectivity between VMs
+  template: 
+    src=iptables.j2 
+    dest=/etc/sysconfig/iptables
+- name: Enable host resolution
+  template: 
+    src=hosts.j2 
+    dest=/etc/hosts
+- name: Enable new vagrant virtual host
+  file:
+    src=/usr/share/zoneinfo/America/New_York
+    dest=/etc/localtime
+    state=link
+- name: partition new disk and mount it
+  shell: 
+      echo -e "n\np\n1\n\n\nw" | sudo fdisk /dev/sdb
+      mkfs.xfs -i size=512 /dev/sdb1
+      mkdir -p /var/no-direct-write-here/brick1
+      echo '' >> /etc/fstab >> /etc/fstab
+      echo '# Mount /dev/vdb1 so that it can be used as a glusterfs volume' >> /etc/fstab
+      echo '/dev/vdb1 /var/no-direct-write-here/brick1 xfs defaults 1 2' >> /etc/fstab
+      mount -a && mount
+  args:
+    executable: /bin/bash
+-name: Create glusterfs container
+shell: 
+      docker run -h glusterfs-server -v /etc/glusterfs:/etc/glusterfs:z -v /var/lib/glusterd:/var/lib/glusterd:z -v /var/log/glusterfs:/var/log/glusterfs:z -v /sys/fs/cgroup:/sys/fs/cgroup:ro -v /var/no-direct-write-here/brick1:/var/no-direct-write-here/brick1 -d --privileged=true --net=host --restart=always --name="glusterfs-server" gluster/gluster-centos
+  args:
+    executable: /bin/bash
