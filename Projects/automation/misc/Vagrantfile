@@ -1,0 +1,70 @@
+ $script = <<-SCRIPT
+	echo " starting provisioning Docker ce"
+	sudo apt-get update
+	sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
+	curl -fsSL get.docker.com -o get-docker.sh
+	sudo sh get-docker.sh
+	sudo systemctl enable --now nfs-server
+	sudo mkdir -p /srv/gitlab-swarm && \
+	sudo mkdir -p /srv/gitlab-swarm/gitlab/{data,logs,config} && \
+	sudo mkdir -p /srv/gitlab-swarm/postgres && \
+	sudo mkdir -p /srv/gitlab-swarm/grafana && \
+	sudo mkdir -p /srv/gitlab-swarm/prometheus && \
+	sudo chmod -R 777 /srv/gitlab-swarm
+	sudo mkdir -p /exports/gitlab-swarm
+	sudo mount --bind /srv/gitlab-swarm /exports/gitlab-swarm
+	sudo apt-get install -y nfs-common
+ SCRIPT
+ 
+Vagrant.configure("2") do |config|
+	config.vm.define "master" do |master|
+		config.vm.box = "generic/ubuntu1804"
+		config.vm.provider :libvirt do |libvirt|
+			libvirt.memory = 512
+			libvirt.cpus = 1
+		end
+		config.vm.provision "shell", inline: $script
+	end
+	config.vm.define "node1" do |node1|
+		config.vm.box = "generic/ubuntu1804"
+		config.vm.provider :libvirt do |libvirt|
+			libvirt.memory = 512
+			libvirt.cpus = 1
+		end
+		config.vm.provision "shell", inline: $script
+	end
+	config.vm.define "node2" do |node2|
+		config.vm.box = "generic/ubuntu1804"
+		config.vm.provider :libvirt do |libvirt|
+			libvirt.memory = 512
+			libvirt.cpus = 1
+		end
+		config.vm.provision "shell", inline: $script
+	end
+	config.vm.define "node3" do |node3|
+		config.vm.box = "generic/ubuntu1804"
+		config.vm.provider :libvirt do |libvirt|
+			libvirt.memory = 512
+			libvirt.cpus = 1
+		end
+		config.vm.provision "shell", inline: $script
+	end
+	config.vm.define "node4" do |node4|
+		config.vm.box = "generic/ubuntu1804"
+		config.vm.provider :libvirt do |libvirt|
+			libvirt.memory = 512
+			libvirt.cpus = 1
+		end
+		config.vm.provision "shell", inline: $script
+	end
+end
+
+ Vagrant.configure(2) do |config|
+ config.vm.box = "generic/ubuntu1804"
+ config.vm.provider :libvirt do |libvirt|
+   libvirt.memory = 512
+   libvirt.cpus = 1
+ end
+ config.vm.provision "shell", inline: $script
+ 
+end

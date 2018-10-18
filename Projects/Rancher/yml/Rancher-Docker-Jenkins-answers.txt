@@ -1,0 +1,48 @@
+PORT=8080
+volume_work=/var/lib/docker/jenkins-ci
+plugins='credentials
+git
+git-client
+github
+github-api
+github-oauth
+greenballs
+junit
+plain-credentials
+scm-api
+ssh-credentials
+ssh-slaves
+swarm
+'
+
+
+
+cat /var/lib/jenkins/secrets/initialAdminPassword
+
+198c3955ef544b04b6fc047480db5447
+
+
+import  java.io.File
+def file = new File('/tmp/file.txt')
+def lines = file.readLines()
+lines.each { String line ->  println line}
+
+ 
+ 
+ 
+import jenkins.model.*
+import java.util.regex.Pattern
+import java.util.Date
+import  java.io.File
+import hudson.plugins.git.*;
+
+def scm = new GitSCM("git@github.com:dermeister0/Tests.git")
+scm.branches = [new BranchSpec("*/develop")];
+
+def flowDefinition = new org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition(scm, "Jenkinsfile")
+
+def parent = Jenkins.instance
+def job = new org.jenkinsci.plugins.workflow.job.WorkflowJob(parent, "New Job")
+job.definition = flowDefinition
+
+parent.reload()

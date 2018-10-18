@@ -1,0 +1,61 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+ $script = <<-SCRIPT
+	systemctl disable docker --now
+	systemctl enable docker-latest --now
+	sed -i '/DOCKERBINARY/s/^#//g' /etc/sysconfig/docker
+ SCRIPT
+disk='./data-drive.vdi'
+Vagrant.configure("2") do |config|
+        config.hostmanager.enabled = true
+        config.hostmanager.manage_host = true
+        config.hostmanager.manage_guest = true
+        config.hostmanager.ignore_private_ip = false
+        config.hostmanager.include_offline = true
+        config.vm.define "ds1" do |ds1|
+                ds1.vm.box = "centos/atomic-host"
+                ds1.vm.hostname = 'ds1'
+                ds1.vm.network :private_network, ip: '192.168.31.11'
+                ds1.hostmanager.aliases = %w(ds1.localdomain ds1)
+                ds1.vm.provider :virtualbox do |virtualbox|
+                unless File.exist?(disk)
+                        virtualbox.customize ['createhd', '--filename', 'ds1' + disk, '--variant', 'Standard', '--size', 20 * 1024]
+                end
+                virtualbox.memory = 1024
+                virtualbox.cpus = 1
+                virtualbox.customize ['storageattach', :id,  '--storagectl', 'IDE', '--port', 1, '--device', 0, '--type', 'hdd', '--medium','ds1' +  disk]
+        end
+end
+        config.vm.define "ds2" do |ds2|
+                config.vm.box = "centos/atomic-host"
+                ds2.vm.hostname = 'ds2'
+                ds2.vm.network :private_network, ip: '192.168.31.12'
+                ds2.hostmanager.aliases = %w(ds2.localdomain ds2)
+                ds2.vm.provider :virtualbox do |virtualbox|
+                unless File.exist?(disk)
+                        virtualbox.customize ['createhd', '--filename', 'ds2' +  disk, '--variant', 'Standard', '--size', 20 * 1024]
+                end
+                virtualbox.memory = 1024
+                virtualbox.cpus = 1
+                virtualbox.customize ['storageattach', :id,  '--storagectl', 'IDE', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', 'ds2' + disk]
+                end
+        end
+        config.vm.define "ds3" do |ds3|
+                config.vm.box = "centos/atomic-host"
+                ds2.vm.hostname = 'ds2'
+                ds2.vm.network :private_network, ip: '192.168.31.13'
+                ds2.hostmanager.aliases = %w(ds3.localdomain ds3)
+                ds2.vm.provider :virtualbox do |virtualbox|
+                unless File.exist?(disk)
+                        virtualbox.customize ['createhd', '--filename', 'ds3' +  disk, '--variant', 'Standard', '--size', 20 * 1024]
+                end
+                virtualbox.memory = 1024
+                virtualbox.cpus = 1
+                virtualbox.customize ['storageattach', :id,  '--storagectl', 'IDE', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', 'ds3' + disk]
+                end
+        end
+		config.vm.provision "shell", inline: $script
+end
+
+
+

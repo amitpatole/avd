@@ -1,0 +1,33 @@
+vagrant up --provider=libvirt
+
+# -*- mode: ruby -*-                                                                                                                                                                           
+# vi: set ft=ruby :                                                                                                                                                                            
+                                                                                                                                                                                               
+Vagrant.configure(2) do |config|                                                                                                                                                               
+        # vagrant-hostmanager plugin                                                                                                                                                           
+        if Vagrant.has_plugin?("vagrant-hostmanager")                                                                                                                                         
+               config.hostmanager.enabled = true                                                                                                                                              
+               config.hostmanager.manage_host = true                                                                                                                                          
+               config.hostmanager.manage_guest = true                                                                                                                                         
+        end                                                                                                                                                                                   
+
+        config.vm.synced_folder ".", "/vagrant", disabled: true                                                                                                                                
+                                                                                                                                                                                               
+        #Use the same key for each machine                                                                                                                                                     
+        #config.ssh.insert_key = false                                                                                                                                                         
+                                                                                                                                                                                               
+        config.vm.provider :libvirt do |libvirt|                                                                                                                                               
+                libvirt.memory = 512
+                libvirt.cpus = 1
+                linked_clone = true
+        end                                                                                                                                                                                    
+                                                                                                                                                                                               
+        config.vm.box = "centos/7"                                                                                                                                               
+                                                                                                                                                                                               
+        (1..3).each do |i|                                                                                                                                                                     
+                config.vm.define "www#{i}" do |webserver|                                                                                                                                  
+                        config.vm.hostname = "www#{i}.example.com"                                                                                                                        
+                        webserver.vm.network :private_network, ip: "172.16.10.10#{i}"                                                                                                           
+                end
+        end
+end 

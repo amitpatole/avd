@@ -1,0 +1,58 @@
+192.168.31.11   ds1
+192.168.31.12   ds2
+192.168.31.13   ds3
+
+mkdir /var/lib/ceph
+chcon -Rt svirt_sandbox_file_t /etc/ceph
+chcon -Rt svirt_sandbox_file_t /var/lib/ceph
+
+
+
+docker run -d --net=host \
+--restart always \
+-v /etc/ceph:/etc/ceph \
+-v /var/lib/ceph/:/var/lib/ceph/ \
+-e MON_IP=192.168.31.11 \
+-e CEPH_PUBLIC_NETWORK=192.168.31.0/24 \
+--name="ceph-mon" \
+ceph/daemon mon
+
+docker run -d --net=host \
+--restart always \
+-v /etc/ceph:/etc/ceph \
+-v /var/lib/ceph/:/var/lib/ceph/ \
+-e MON_IP=192.168.31.12 \
+-e CEPH_PUBLIC_NETWORK=192.168.31.0/24 \
+--name="ceph-mon" \
+ceph/daemon mon
+
+
+
+
+docker run -d --net=host \
+--restart always \
+-v /etc/ceph:/etc/ceph \
+-v /var/lib/ceph/:/var/lib/ceph/ \
+-e MON_IP=192.168.31.13 \
+-e CEPH_PUBLIC_NETWORK=192.168.31.0/24 \
+--name="ceph-mon" \
+ceph/daemon mon
+
+Setup Managers all nodes
+
+docker run -d --net=host \
+--privileged=true \
+--pid=host \
+-v /etc/ceph:/etc/ceph \
+-v /var/lib/ceph/:/var/lib/ceph/ \
+--name="ceph-mgr" \
+--restart=always \
+ceph/daemon mgr
+
+
+ceph auth get client.bootstrap-osd -o \
+/var/lib/ceph/bootstrap-osd/ceph.keyring
+
+
+
+docker run -d --net=host --privileged=true --pid=host -v /etc/ceph:/etc/ceph -v /var/lib/ceph/:/var/lib/ceph/ -v /dev/:/dev/ -e OSD_FORCE_ZAP=1 -e OSD_DEVICE=/dev/sdb -e OSD_TYPE=disk --name="ceph-osd" --restart=always ceph/daemon osd_ceph_disk

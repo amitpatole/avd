@@ -1,0 +1,12 @@
+- name: Mount gluster volume
+  shell: 
+    mkdir /var/data
+    MYHOST=`hostname -s`
+    echo '' >> /etc/fstab >> /etc/fstab
+    echo '# Mount glusterfs volume' >> /etc/fstab
+    echo "$MYHOST:/gv0                /var/data      glusterfs       defaults,_netdev,context="system_u:object_r:svirt_sandbox_file_t:s0"  0  0"  >> /etc/fstab
+    mount -a
+  args:
+    executable: /bin/bash
+
+
