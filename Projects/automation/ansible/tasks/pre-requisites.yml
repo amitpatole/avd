@@ -4,17 +4,22 @@
   #apt: name=apache2 state=present
 - name: Permit connectivity between VMs
   template: 
-    src=iptables.j2 
-    dest=/etc/sysconfig/iptables
+   src: iptables.j2 
+   dest: /etc/sysconfig/iptables
+
 - name: Enable host resolution
   template: 
-    src=hosts.j2 
-    dest=/etc/hosts
+    src: hosts.j2 
+    dest: /etc/hosts
+    ignore_errors: yes
+
+
 - name: Enable new vagrant virtual host
+  ignore_errors: yes
   file:
-    src=/usr/share/zoneinfo/America/New_York
-    dest=/etc/localtime
-    state=link
+    src: /usr/share/zoneinfo/America/New_York
+    dest: /etc/localtime
+    state: link
 - name: partition new disk and mount it
   shell: 
       echo -e "n\np\n1\n\n\nw" | sudo fdisk /dev/sdb
@@ -26,8 +31,8 @@
       mount -a && mount
   args:
     executable: /bin/bash
--name: Create glusterfs container
-shell: 
+- name: Create glusterfs container
+  shell: 
       docker run -h glusterfs-server -v /etc/glusterfs:/etc/glusterfs:z -v /var/lib/glusterd:/var/lib/glusterd:z -v /var/log/glusterfs:/var/log/glusterfs:z -v /sys/fs/cgroup:/sys/fs/cgroup:ro -v /var/no-direct-write-here/brick1:/var/no-direct-write-here/brick1 -d --privileged=true --net=host --restart=always --name="glusterfs-server" gluster/gluster-centos
   args:
     executable: /bin/bash
