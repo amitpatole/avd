@@ -1,0 +1,5 @@
+-name: Create glusterfs container
+shell: 
+      docker run -h glusterfs-server -v /etc/glusterfs:/etc/glusterfs:z -v /var/lib/glusterd:/var/lib/glusterd:z -v /var/log/glusterfs:/var/log/glusterfs:z -v /sys/fs/cgroup:/sys/fs/cgroup:ro -v /var/no-direct-write-here/brick1:/var/no-direct-write-here/brick1 -d --privileged=true --net=host --restart=always --name="glusterfs-server" gluster/gluster-centos
+  args:
+    executable: /bin/bash

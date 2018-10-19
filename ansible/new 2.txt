@@ -1,0 +1,39 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+ $script = <<-SCRIPT
+	systemctl disable docker --now
+	systemctl enable docker-latest --now
+	sed -i '/DOCKERBINARY/s/^#//g' /etc/sysconfig/docker
+ SCRIPT
+disk='data-drive.vdi'
+config.hostmanager.enabled = true
+config.hostmanager.manage_host = true
+config.hostmanager.manage_guest = true
+config.hostmanager.ignore_private_ip = false
+config.hostmanager.include_offline = true
+N = 3
+(1..N).each do |machine_id|
+  config.vm.define "datastore#{datastore_id}" do |datastore|
+    datastore.vm.hostname = "datastore#{datastore_id}"
+    datastore.vm.network "private_network", ip: "192.168.31.#{1+datastore_id}"
+	datastore.vm.provider :virtualbox do |virtualbox|
+	unless File.exist?(disk)
+	virtualbox.customize ['createhd', '--filename', 'ds'+datastore_id+disk, '--variant', 'Standard', '--size', 20 * 1024]
+	end
+	virtualbox.memory = 1024
+	virtualbox.cpus = 1
+	virtualbox.customize ['storageattach', :id,  '--storagectl', 'IDE', '--port', 1, '--device', 0, '--type', 'hdd', '--medium','ds'+datastore_id+disk]
+	end
+
+    # Only execute once the Ansible provisioner,
+    # when all the datastores are up and ready.
+    if datastore_id == N
+	  datastore.vm.provision "shell", inline: $script
+      datastore.vm.provision :ansible do |ansible|
+        # Disable default limit to connect to all the datastores
+        ansible.limit = "all"
+        ansible.playbook = "playbook.yml"
+      end
+    end
+  end
+end

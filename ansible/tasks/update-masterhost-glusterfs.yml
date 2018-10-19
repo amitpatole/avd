@@ -1,0 +1,9 @@
+- name: Create trusted pool
+    hosts: [ds2,ds3]
+
+tasks: 
+  - name: Go Into Docker Container And update the name of the host which started the volume
+    docker:
+      command: 
+        docker exec -it glusterfs-server bash -l -c "gluster peer probe ds1"
+        
