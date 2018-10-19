@@ -1,7 +1,6 @@
 - name: Create trusted pool
-    hosts: [ds2,ds3]
-
-tasks: 
+  hosts: [ds2,ds3]
+  tasks: 
   - name: Go Into Docker Container And update the name of the host which started the volume
     docker:
       command: 
