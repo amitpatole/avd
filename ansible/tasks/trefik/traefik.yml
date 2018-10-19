@@ -1,0 +1,27 @@
+- name: Prepare the host
+  shell: 
+    mkdir ~/dockersock
+    cd ~/dockersock
+    curl -O https://raw.githubusercontent.com/dpw/\
+    selinux-dockersock/master/Makefile
+    curl -O https://raw.githubusercontent.com/dpw/\
+    selinux-dockersock/master/dockersock.te
+    make && semodule -i dockersock.pp
+  args:
+    executable: /bin/bash
+- name: Prepare traefik.toml
+  template: 
+    src: traefik-toml.j2 
+    dest: /var/data/traefik/traefik.toml
+- name: Prepare Docker-Compose yml
+  template:
+    src: docker-compose.j2
+    dest: /var/data/config/traefik/docker-compose.yml
+- name: create acme.jason
+  shell:
+    touch /var/data/traefik/acme.json
+    chmod 600 /var/data/traefik/acme.json
+    docker stack deploy traefik -c /var/data/traefik/docker-compose.yml
+    docker stack ps traefik
+  args:
+    executable: /bin/bash
