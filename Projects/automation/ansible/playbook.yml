@@ -6,4 +6,3 @@
     - include: tasks/update-masterhost-glusterfs.yml
     - include: tasks/mount-gluster-volume.yml
     - include: tasks/keepalived/Keepalived.yml
-dddd
