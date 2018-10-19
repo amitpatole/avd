@@ -1,9 +1,9 @@
 - name: Create trusted pool
-    hosts: ds1
-    tasks: 
+  hosts: ds1
+  tasks: 
     - name: Go Into Docker Container And Create trusted pool for ds2
-    docker:
-    command: 
+      docker:
+      command: 
         docker exec -it glusterfs-server bash -l -c "gluster peer probe ds2"
         docker exec -it glusterfs-server bash -l -c "gluster peer probe ds3"
         docker exec -it glusterfs-server bash -l -c "gluster peer status" 
@@ -14,37 +14,37 @@
         docker exec -it glusterfs-server bash -l -c "gluster peer probe ds3"        
         
         
----
-- hosts: master
-  gather_facts: no
-  tasks:
+# ---
+# - hosts: master
+#   gather_facts: no
+#   tasks:
 
-  - name: gather list of containers
-    shell: docker ps | grep 'glusterfs-server' 
-    #awk '/{{ item }}/{print $1}'
-    register: list_of_containers
-    with_items:
-      - busybox
+#   - name: gather list of containers
+#     shell: docker ps | grep 'glusterfs-server' 
+#     #awk '/{{ item }}/{print $1}'
+#     register: list_of_containers
+#     with_items:
+#       - busybox
 
-  #- name: debug
-  #  debug: msg="{{ list_of_containers }}"
+#   #- name: debug
+#   #  debug: msg="{{ list_of_containers }}"
 
-  - name: run action in container(s)
-    docker_container:
-      name: temp-container
-      image: busybox
-      command: 
-              uptime
-              gluster peer probe ds2
-              gluster peer probe ds3
-              gluster peer status 
-              gluster peer status 
-              gluster volume create gv0 replica 2  'ds2:/var/no-direct-write-here/brick1' 'ds3:/var/no-direct-write-here/brick1'
-              gluster volume start gv0
-              gluster peer probe ds2
-              gluster peer probe ds3        
-      cleanup: yes
-      detach: yes
-    register: result_of_action
-    with_items:
-      - list_of_containers.results.stdout_lines
+#   - name: run action in container(s)
+#     docker_container:
+#       name: temp-container
+#       image: busybox
+#       command: 
+#               uptime
+#               gluster peer probe ds2
+#               gluster peer probe ds3
+#               gluster peer status 
+#               gluster peer status 
+#               gluster volume create gv0 replica 2  'ds2:/var/no-direct-write-here/brick1' 'ds3:/var/no-direct-write-here/brick1'
+#               gluster volume start gv0
+#               gluster peer probe ds2
+#               gluster peer probe ds3        
+#       cleanup: yes
+#       detach: yes
+#     register: result_of_action
+#     with_items:
+#       - list_of_containers.results.stdout_lines
