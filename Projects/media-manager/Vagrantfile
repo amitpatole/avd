@@ -16,7 +16,7 @@ Vagrant.configure("2") do |config|
                 mm1.vm.box = "centos/7"
                 mm1.vm.hostname = 'mm1'
                 mm1.vm.network :private_network, ip: '192.168.31.11'
-                mm1.hostmanager.aliases = %w(mm1.myowncloud.us mm1)
+                mm1.hostmanager.aliases = %w(mm1.localdomain mm1)
                 mm1.vm.provider :virtualbox do |virtualbox|
                 unless File.exist?(disk)
                         virtualbox.customize ['createhd', '--filename', 'mm1' + disk, '--variant', 'Standard', '--size', 20 * 1024]
@@ -30,7 +30,7 @@ end
                 config.vm.box = "centos/7"
                 mm2.vm.hostname = 'mm2'
                 mm2.vm.network :private_network, ip: '192.168.31.12'
-                mm2.hostmanager.aliases = %w(mm2.myowncloud.us mm2)
+                mm2.hostmanager.aliases = %w(mm2.localdomain mm2)
                 mm2.vm.provider :virtualbox do |virtualbox|
                 unless File.exist?(disk)
                         virtualbox.customize ['createhd', '--filename', 'mm2' +  disk, '--variant', 'Standard', '--size', 20 * 1024]
@@ -42,10 +42,10 @@ end
         end
         config.vm.define "mm3" do |mm3|
                 config.vm.box = "centos/7"
-                mm3.vm.hostname = 'mm3'
-                mm3.vm.network :private_network, ip: '192.168.31.13'
-                mm3.hostmanager.aliases = %w(mm3.myowncloud.us mm3)
-                mm3.vm.provider :virtualbox do |virtualbox|
+                mm2.vm.hostname = 'mm2'
+                mm2.vm.network :private_network, ip: '192.168.31.13'
+                mm2.hostmanager.aliases = %w(mm3.localdomain mm3)
+                mm2.vm.provider :virtualbox do |virtualbox|
                 unless File.exist?(disk)
                         virtualbox.customize ['createhd', '--filename', 'mm3' +  disk, '--variant', 'Standard', '--size', 20 * 1024]
                 end
@@ -58,4 +58,5 @@ end
 		config.vm.provision :ansible do |ansible|
 			ansible.playbook = "playbook.yml"
 		end
+end
 end

@@ -1,4 +1,5 @@
-- hosts: ds1
+- name: Orchestrate
+  hosts: ds1
   sudo: true
   tasks:
     - include: tasks/create-trusted-pool.yml

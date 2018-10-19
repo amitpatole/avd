@@ -1,7 +1,6 @@
 - name: Create trusted pool
-    hosts: ds1
-
-tasks: 
+  hosts: ds1
+  tasks: 
   - name: Go Into Docker Container And Create trusted pool for ds2
     docker:
       command: 
