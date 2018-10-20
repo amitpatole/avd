@@ -23,27 +23,27 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       'ds3'     => '192.168.31.13',
     }.each do |app_name, ip_address|
       config.vm.define app_name do |node|
-          disk='./app_name.data-drive.vdi'
           node.vm.hostname = app_name + "." + project_name + ".dev"
+          disk='./data-drive.vdi'
           node.vm.network :private_network, ip: ip_address
           node.vm.provider :virtualbox do |virtualbox|
             unless File.exist?(disk)
-                virtualbox.customize ['createhd', '--filename', disk, '--variant', 'Standard', '--size', 20 * 1024]
+                virtualbox.customize ['createhd', '--filename', app_name+disk, '--variant', 'Standard', '--size', 20 * 1024]
             end
             virtualbox.memory = 1024
             virtualbox.cpus = 1
-            virtualbox.customize ['storageattach', :id,  '--storagectl', 'IDE', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', disk]
+            virtualbox.customize ['storageattach', :id,  '--storagectl', 'IDE', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', app_name+disk]
         end
     end
     end
     config.vm.provision :hostmanager
     config.vm.provision "shell", inline: $script
-    config.vm.provision :ansible do |ansible|
-      ansible.groups = {
-        "Master" => ["ds1"],
-        "nodes" => ["ds2", "ds3"],
-        "all_groups:children" => ["Master", "nodes"],
-      }
-      ansible.playbook = "./playbook.yml"
-    end
+#    config.vm.provision :ansible do |ansible|
+#      ansible.groups = {
+#        "Master" => ["ds1"],
+#        "nodes" => ["ds2", "ds3"],
+#        "all_groups:children" => ["Master", "nodes"],
+#      }
+#      ansible.playbook = "./playbook.yml"
+#    end
 end
