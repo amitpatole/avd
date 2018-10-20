@@ -1,0 +1,14 @@
+- name: Create trusted pool
+  hosts: ds1
+  tasks: 
+  - name: Go Into Docker Container And Create trusted pool for ds2
+    docker:
+      command: 
+        docker exec -it glusterfs-server bash -l -c "gluster peer probe ds2"
+        docker exec -it glusterfs-server bash -l -c "gluster peer probe ds3"
+        docker exec -it glusterfs-server bash -l -c "gluster peer status" 
+        docker exec -it glusterfs-server bash -l -c "gluster peer status" 
+        docker exec -it glusterfs-server bash -l -c "gluster volume create gv0 replica 2 ds2:/var/no-direct-write-here/brick1 ds3:/var/no-direct-write-here/brick1"
+        docker exec -it glusterfs-server bash -l -c "gluster volume start gv0"
+        docker exec -it glusterfs-server bash -l -c "gluster peer probe ds2"
+        docker exec -it glusterfs-server bash -l -c "gluster peer probe ds3"        

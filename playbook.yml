@@ -1,0 +1,10 @@
+- hosts: all
+  sudo: true
+  tasks:
+    - include: tasks/pre-requisites.yml
+    - include: tasks/create-trusted-pool.yml
+    - include: tasks/update-masterhost-glusterfs.yml
+    - include: tasks/mount-gluster-volume.yml
+    - include: tasks/keepalived/Keepalived.yml
+    - include: tasks/swarm/Docker-Swarm-Mode.yml
+    - include: tasks/traefik/traefik.yml
