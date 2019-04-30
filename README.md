@@ -1,2 +1,2 @@
 # avd
-This project has an example of automation done using vagrant anisble and docker
+Something to do when I have little time for my own on my home lab
